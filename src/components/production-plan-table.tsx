@@ -247,7 +247,7 @@ export function ProductionPlanTable({ data, users, ranks, onRefresh }: Productio
                 }
                 return (
                     <div
-                        className="px-2 py-1 text-xs text-center cursor-pointer hover:bg-slate-100 rounded transition-colors min-w-[100px]"
+                        className="bg-green-600 text-white font-medium px-2 py-1 rounded text-xs text-center cursor-pointer hover:bg-green-700 transition-colors min-w-[100px]"
                         onClick={() => handleCellClick(row.original, "INSERTION_COMPLETION")}
                     >
                         {val}
