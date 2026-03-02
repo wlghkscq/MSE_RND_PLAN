@@ -19,7 +19,7 @@ export default function Home() {
     const { data: plans, error } = await supabase
       .from("production_plan")
       .select("*")
-      .order("created_at", { ascending: false });
+      .order("delivery_date", { ascending: true });
 
     if (error) {
       console.error("Error fetching data:", error);

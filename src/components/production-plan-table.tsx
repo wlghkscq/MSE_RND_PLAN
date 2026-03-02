@@ -60,22 +60,26 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
             accessorKey: "p_no",
             header: "P/no",
             cell: ({ row }) => (
-                <div className="bg-amber-400 font-bold px-2 py-1 rounded text-xs text-center">
+                <div className="bg-amber-400 font-bold px-2 py-1 rounded text-xs text-center min-w-[100px]">
                     {row.original.p_no}
                 </div>
             ),
         },
         { accessorKey: "supplier", header: "공급처" },
-        { accessorKey: "delivery_date", header: "납기" },
+        {
+            accessorKey: "delivery_date",
+            header: "납기",
+            cell: ({ row }) => <div className="min-w-[80px] text-center">{row.original.delivery_date}</div>
+        },
         {
             accessorKey: "order_quantity",
             header: "주문수량",
-            cell: ({ row }) => <div className="text-center">{row.original.order_quantity}</div>,
+            cell: ({ row }) => <div className="text-center min-w-[60px]">{row.original.order_quantity}</div>,
         },
         {
             accessorKey: "remarks",
             header: "비고",
-            cell: ({ row }) => <div className="text-[10px] leading-tight max-w-[200px] truncate">{row.original.remarks}</div>,
+            cell: ({ row }) => <div className="text-[10px] leading-tight max-w-[200px] min-w-[150px] truncate">{row.original.remarks}</div>,
         },
         { accessorKey: "category", header: "구분" },
         { accessorKey: "model_name", header: "모델명" },
@@ -89,7 +93,7 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
                         <Button
                             variant="default"
                             size="sm"
-                            className="h-7 text-[10px] px-2 bg-blue-600 hover:bg-blue-700 w-full"
+                            className="h-7 text-[10px] px-2 bg-blue-600 hover:bg-blue-700 w-full min-w-[80px]"
                             onClick={() => handleCellClick(row.original, "SMD_T")}
                         >
                             일정등록
@@ -98,7 +102,7 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
                 }
                 return (
                     <div
-                        className="bg-green-600 text-white font-medium px-2 py-1 rounded text-xs text-center cursor-pointer hover:bg-green-700 transition-colors"
+                        className="bg-green-600 text-white font-medium px-2 py-1 rounded text-xs text-center cursor-pointer hover:bg-green-700 transition-colors min-w-[80px]"
                         onClick={() => handleCellClick(row.original, "SMD_T")}
                     >
                         {val}
@@ -116,7 +120,7 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
                         <Button
                             variant="default"
                             size="sm"
-                            className="h-7 text-[10px] px-2 bg-blue-600 hover:bg-blue-700 w-full"
+                            className="h-7 text-[10px] px-2 bg-blue-600 hover:bg-blue-700 w-full min-w-[80px]"
                             onClick={() => handleCellClick(row.original, "IMD")}
                         >
                             일정등록
@@ -125,7 +129,7 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
                 }
                 return (
                     <div
-                        className="bg-green-600 text-white font-medium px-2 py-1 rounded text-xs text-center cursor-pointer hover:bg-green-700 transition-colors"
+                        className="bg-green-600 text-white font-medium px-2 py-1 rounded text-xs text-center cursor-pointer hover:bg-green-700 transition-colors min-w-[80px]"
                         onClick={() => handleCellClick(row.original, "IMD")}
                     >
                         {val}
@@ -143,7 +147,7 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
                         <Button
                             variant="default"
                             size="sm"
-                            className="h-7 text-[10px] px-2 bg-blue-600 hover:bg-blue-700 w-full"
+                            className="h-7 text-[10px] px-2 bg-blue-600 hover:bg-blue-700 w-full min-w-[80px]"
                             onClick={() => handleCellClick(row.original, "SMD_B")}
                         >
                             일정등록
@@ -152,7 +156,7 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
                 }
                 return (
                     <div
-                        className="bg-green-600 text-white font-medium px-2 py-1 rounded text-xs text-center cursor-pointer hover:bg-green-700 transition-colors"
+                        className="bg-green-600 text-white font-medium px-2 py-1 rounded text-xs text-center cursor-pointer hover:bg-green-700 transition-colors min-w-[80px]"
                         onClick={() => handleCellClick(row.original, "SMD_B")}
                     >
                         {val}
@@ -170,7 +174,7 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
                         <Button
                             variant="default"
                             size="sm"
-                            className="h-7 text-[10px] px-2 bg-blue-600 hover:bg-blue-700 w-full"
+                            className="h-7 text-[10px] px-2 bg-blue-600 hover:bg-blue-700 w-full min-w-[100px]"
                             onClick={() => handleCellClick(row.original, "INSERTION_REQUEST")}
                         >
                             일정등록
@@ -179,7 +183,7 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
                 }
                 return (
                     <div
-                        className="bg-green-600 text-white font-medium px-2 py-1 rounded text-xs text-center cursor-pointer hover:bg-green-700 transition-colors"
+                        className="bg-green-600 text-white font-medium px-2 py-1 rounded text-xs text-center cursor-pointer hover:bg-green-700 transition-colors min-w-[100px]"
                         onClick={() => handleCellClick(row.original, "INSERTION_REQUEST")}
                     >
                         {val}
@@ -197,7 +201,7 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
                         <Button
                             variant="default"
                             size="sm"
-                            className="h-7 text-[10px] px-2 bg-blue-600 hover:bg-blue-700 w-full"
+                            className="h-7 text-[10px] px-2 bg-blue-600 hover:bg-blue-700 w-full min-w-[100px]"
                             onClick={() => handleCellClick(row.original, "INSERTION_COMPLETION")}
                         >
                             일정등록
@@ -206,7 +210,7 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
                 }
                 return (
                     <div
-                        className="px-2 py-1 text-xs text-center cursor-pointer hover:bg-slate-100 rounded transition-colors"
+                        className="px-2 py-1 text-xs text-center cursor-pointer hover:bg-slate-100 rounded transition-colors min-w-[100px]"
                         onClick={() => handleCellClick(row.original, "INSERTION_COMPLETION")}
                     >
                         {val}
@@ -217,7 +221,7 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
         {
             accessorKey: "is_new",
             header: "신규 여부",
-            cell: ({ row }) => <div className="text-[10px] leading-tight">{row.original.is_new}</div>,
+            cell: ({ row }) => <div className="text-[10px] leading-tight min-w-[100px]">{row.original.is_new}</div>,
         },
         {
             accessorKey: "manager",
@@ -225,7 +229,7 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
             cell: ({ row }) => {
                 const isDuplicate = row.original.duplicate_status === "있음";
                 return (
-                    <div className={cn("bg-amber-400 font-bold px-2 py-1 rounded text-xs text-center", isDuplicate && "bg-red-500 text-white")}>
+                    <div className={cn("bg-amber-400 font-bold px-2 py-1 rounded text-xs text-center min-w-[80px]", isDuplicate && "bg-red-500 text-white")}>
                         {row.original.manager}
                     </div>
                 );
@@ -241,6 +245,22 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
         getFilteredRowModel: getFilteredRowModel(),
         state: { columnFilters },
     });
+
+    // Function to determine if a column should be sticky
+    const getStickyClass = (columnId: string) => {
+        if (columnId === "delivery_date") return "sticky left-0 z-20 bg-inherit shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]";
+        if (columnId === "order_quantity") return "sticky left-[80px] z-20 bg-inherit shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]";
+        if (columnId === "remarks") return "sticky left-[140px] z-20 bg-inherit shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]";
+        return "";
+    };
+
+    // Header offsets for sticky
+    const getHeaderStickyClass = (columnId: string) => {
+        if (columnId === "delivery_date") return "sticky left-0 z-30 bg-slate-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]";
+        if (columnId === "order_quantity") return "sticky left-[80px] z-30 bg-slate-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]";
+        if (columnId === "remarks") return "sticky left-[140px] z-30 bg-slate-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]";
+        return "";
+    };
 
     return (
         <div className="space-y-4">
@@ -268,13 +288,19 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
                     className="max-w-[150px] h-8 text-xs bg-white"
                 />
             </div>
-            <div className="rounded-md border overflow-x-auto">
-                <Table className="border-collapse text-[11px]">
-                    <TableHeader className="bg-slate-50 border-b">
+            <div className="rounded-md border overflow-x-auto relative">
+                <Table className="border-collapse text-[11px] table-fixed w-full min-w-[1500px]">
+                    <TableHeader className="bg-slate-50 border-b sticky top-0 z-40">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id} className="hover:bg-transparent">
                                 {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id} className="h-10 px-2 py-1 font-bold text-slate-800 border-x text-center whitespace-nowrap">
+                                    <TableHead
+                                        key={header.id}
+                                        className={cn(
+                                            "h-10 px-2 py-1 font-bold text-slate-800 border-x text-center whitespace-nowrap",
+                                            getHeaderStickyClass(header.column.id)
+                                        )}
+                                    >
                                         <div className="flex items-center justify-center gap-1">
                                             {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                                             <Filter className="w-3 h-3 text-slate-400" />
@@ -290,12 +316,18 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
                                 <TableRow
                                     key={row.id}
                                     className={cn(
-                                        "hover:bg-slate-50/50 h-10 border-b",
+                                        "hover:bg-slate-50/50 h-10 border-b relative",
                                         row.original.duplicate_status === "있음" && "bg-red-50 hover:bg-red-100"
                                     )}
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="p-1 border-x whitespace-nowrap">
+                                        <TableCell
+                                            key={cell.id}
+                                            className={cn(
+                                                "p-1 border-x whitespace-nowrap",
+                                                getStickyClass(cell.column.id)
+                                            )}
+                                        >
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
                                     ))}
