@@ -31,3 +31,9 @@ export interface UserMaster {
     department?: string;
     job_rank?: string;
 }
+
+export interface RankMaster {
+    id: number;
+    rank_name: string;
+    // Other fields if any
+}

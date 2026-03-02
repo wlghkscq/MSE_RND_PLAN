@@ -4,27 +4,42 @@ import React, { useEffect, useState } from "react";
 import { ProductionPlanTable } from "@/components/production-plan-table";
 import { AddPlanDialog } from "@/components/add-plan-dialog";
 import { supabase } from "@/lib/supabase";
-import { ProductionPlan } from "@/types/production-plan";
+import { ProductionPlan, UserMaster, RankMaster } from "@/types/production-plan";
 import { Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export default function Home() {
   const [data, setData] = useState<ProductionPlan[]>([]);
+  const [users, setUsers] = useState<UserMaster[]>([]);
+  const [ranks, setRanks] = useState<RankMaster[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     setLoading(true);
-    // 실제 운영 시 v_production_plan_status 뷰에서 데이터를 가져오는 것이 좋습니다.
-    const { data: plans, error } = await supabase
+
+    // Fetch production plans
+    const { data: plans, error: planError } = await supabase
       .from("production_plan")
       .select("*")
       .order("delivery_date", { ascending: true });
 
-    if (error) {
-      console.error("Error fetching data:", error);
+    // Fetch users
+    const { data: userData, error: userError } = await supabase
+      .from("user_master")
+      .select("*");
+
+    // Fetch ranks
+    const { data: rankData, error: rankError } = await supabase
+      .from("rank_master")
+      .select("*");
+
+    if (planError || userError || rankError) {
+      console.error("Error fetching data:", planError || userError || rankError);
     } else {
       setData(plans || []);
+      setUsers(userData || []);
+      setRanks(rankData || []);
     }
     setLoading(false);
   };
@@ -56,7 +71,7 @@ export default function Home() {
               <p className="text-slate-500 font-medium">데이터를 불러오는 중입니다...</p>
             </div>
           ) : (
-            <ProductionPlanTable data={data} onRefresh={fetchData} />
+            <ProductionPlanTable data={data} users={users} ranks={ranks} onRefresh={fetchData} />
           )}
         </section>
       </div>

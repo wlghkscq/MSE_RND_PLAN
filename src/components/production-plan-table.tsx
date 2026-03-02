@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
     ColumnDef,
     flexRender,
@@ -19,24 +19,46 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ProductionPlan } from "@/types/production-plan";
+import { ProductionPlan, UserMaster, RankMaster } from "@/types/production-plan";
 import { cn } from "@/lib/utils";
 import { Filter } from "lucide-react";
 import { ScheduleDialog } from "@/components/schedule-dialog";
 
 interface ProductionPlanTableProps {
     data: ProductionPlan[];
+    users: UserMaster[];
+    ranks: RankMaster[];
     onRefresh: () => void;
 }
 
-export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProps) {
+export function ProductionPlanTable({ data, users, ranks, onRefresh }: ProductionPlanTableProps) {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
     const [selectedPlan, setSelectedPlan] = useState<ProductionPlan | null>(null);
     const [activeMode, setActiveMode] = useState<"SMD_T" | "IMD" | "SMD_B" | "INSERTION_REQUEST" | "INSERTION_COMPLETION">("SMD_T");
 
+    // Create a map for quick name -> rank lookup
+    const userRankMap = useMemo(() => {
+        const map = new Map<string, string>();
+        users.forEach(user => {
+            if (user.name) {
+                // Find the rank name that matches user.job_rank
+                const rank = ranks.find(r => String(r.id) === String(user.job_rank) || r.rank_name === user.job_rank);
+                map.set(user.name, rank ? rank.rank_name : "");
+            }
+        });
+        return map;
+    }, [users, ranks]);
+
+    const getRankedName = (name?: string) => {
+        if (!name) return "";
+        const rank = userRankMap.get(name);
+        return rank ? `${name} ${rank}` : name;
+    };
+
     const formatCombined = (name?: string, dateStr?: string) => {
         if (!name && !dateStr) return null;
+        const rankedName = getRankedName(name);
         let formattedDate = "";
         if (dateStr) {
             const date = new Date(dateStr);
@@ -46,7 +68,7 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
                 formattedDate = ` (${dateStr})`;
             }
         }
-        return `${name || ""}${formattedDate}`;
+        return `${rankedName}${formattedDate}`;
     };
 
     const formatDateShort = (dateStr?: string) => {
@@ -98,7 +120,6 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
                 </div>
             ),
         },
-        // Category and Model Name hidden as requested
         {
             id: "smd_t_combined",
             header: "SMD_T",
@@ -248,9 +269,10 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
             header: "담당자",
             cell: ({ row }) => {
                 const isDuplicate = row.original.duplicate_status === "있음";
+                const rankedName = getRankedName(row.original.manager);
                 return (
                     <div className={cn("bg-amber-400 font-bold px-2 py-1 rounded text-xs text-center min-w-[80px]", isDuplicate && "bg-red-500 text-white")}>
-                        {row.original.manager}
+                        {rankedName}
                     </div>
                 );
             },
@@ -266,18 +288,13 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
         state: { columnFilters },
     });
 
-    // Function to determine if a column should be sticky
-    // Offsets based on fixed widths above:
-    // P/no: 0, Supplier: 100? No, user wants Delivery Date, Order Qty, Remarks sticky.
-    // Let's re-order or just calculate offsets.
-    // P/no [90] + Supplier [70] = 160
     const getStickyClass = (columnId: string, isDuplicate: boolean) => {
         const bgClass = isDuplicate ? "bg-red-50" : "bg-white";
         const baseClass = `sticky z-20 ${bgClass} shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]`;
 
         if (columnId === "delivery_date") return cn(baseClass, "left-0 border-l-2");
-        if (columnId === "order_quantity") return cn(baseClass, "left-[60px]"); // Width of delivery_date + padding
-        if (columnId === "remarks") return cn(baseClass, "left-[110px]"); // + order_quantity
+        if (columnId === "order_quantity") return cn(baseClass, "left-[60px]");
+        if (columnId === "remarks") return cn(baseClass, "left-[110px]");
         return "";
     };
 
