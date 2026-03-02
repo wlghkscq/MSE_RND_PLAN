@@ -49,6 +49,15 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
         return `${name || ""}${formattedDate}`;
     };
 
+    const formatDateShort = (dateStr?: string) => {
+        if (!dateStr) return "";
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return dateStr;
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${month}-${day}`;
+    };
+
     const handleCellClick = (plan: ProductionPlan, mode: typeof activeMode) => {
         setSelectedPlan(plan);
         setActiveMode(mode);
@@ -60,29 +69,36 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
             accessorKey: "p_no",
             header: "P/no",
             cell: ({ row }) => (
-                <div className="bg-amber-400 font-bold px-2 py-1 rounded text-xs text-center min-w-[100px]">
+                <div className="bg-amber-400 font-bold px-2 py-1 rounded text-[10px] text-center w-[90px]">
                     {row.original.p_no}
                 </div>
             ),
         },
-        { accessorKey: "supplier", header: "공급처" },
+        {
+            accessorKey: "supplier",
+            header: "공급처",
+            cell: ({ row }) => <div className="w-[70px] text-center truncate">{row.original.supplier}</div>
+        },
         {
             accessorKey: "delivery_date",
             header: "납기",
-            cell: ({ row }) => <div className="min-w-[80px] text-center">{row.original.delivery_date}</div>
+            cell: ({ row }) => <div className="w-[50px] text-center font-medium">{formatDateShort(row.original.delivery_date)}</div>
         },
         {
             accessorKey: "order_quantity",
             header: "주문수량",
-            cell: ({ row }) => <div className="text-center min-w-[60px]">{row.original.order_quantity}</div>,
+            cell: ({ row }) => <div className="text-center w-[40px]">{row.original.order_quantity}</div>,
         },
         {
             accessorKey: "remarks",
             header: "비고",
-            cell: ({ row }) => <div className="text-[10px] leading-tight max-w-[200px] min-w-[150px] truncate">{row.original.remarks}</div>,
+            cell: ({ row }) => (
+                <div className="text-[10px] leading-tight w-[180px] truncate" title={row.original.remarks}>
+                    {row.original.remarks}
+                </div>
+            ),
         },
-        { accessorKey: "category", header: "구분" },
-        { accessorKey: "model_name", header: "모델명" },
+        // Category and Model Name hidden as requested
         {
             id: "smd_t_combined",
             header: "SMD_T",
@@ -221,7 +237,11 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
         {
             accessorKey: "is_new",
             header: "신규 여부",
-            cell: ({ row }) => <div className="text-[10px] leading-tight min-w-[100px]">{row.original.is_new}</div>,
+            cell: ({ row }) => (
+                <div className="text-[10px] leading-tight w-[120px] truncate" title={row.original.is_new}>
+                    {row.original.is_new}
+                </div>
+            ),
         },
         {
             accessorKey: "manager",
@@ -247,18 +267,25 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
     });
 
     // Function to determine if a column should be sticky
-    const getStickyClass = (columnId: string) => {
-        if (columnId === "delivery_date") return "sticky left-0 z-20 bg-inherit shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]";
-        if (columnId === "order_quantity") return "sticky left-[80px] z-20 bg-inherit shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]";
-        if (columnId === "remarks") return "sticky left-[140px] z-20 bg-inherit shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]";
+    // Offsets based on fixed widths above:
+    // P/no: 0, Supplier: 100? No, user wants Delivery Date, Order Qty, Remarks sticky.
+    // Let's re-order or just calculate offsets.
+    // P/no [90] + Supplier [70] = 160
+    const getStickyClass = (columnId: string, isDuplicate: boolean) => {
+        const bgClass = isDuplicate ? "bg-red-50" : "bg-white";
+        const baseClass = `sticky z-20 ${bgClass} shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]`;
+
+        if (columnId === "delivery_date") return cn(baseClass, "left-0 border-l-2");
+        if (columnId === "order_quantity") return cn(baseClass, "left-[60px]"); // Width of delivery_date + padding
+        if (columnId === "remarks") return cn(baseClass, "left-[110px]"); // + order_quantity
         return "";
     };
 
-    // Header offsets for sticky
     const getHeaderStickyClass = (columnId: string) => {
-        if (columnId === "delivery_date") return "sticky left-0 z-30 bg-slate-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]";
-        if (columnId === "order_quantity") return "sticky left-[80px] z-30 bg-slate-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]";
-        if (columnId === "remarks") return "sticky left-[140px] z-30 bg-slate-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]";
+        const baseClass = "sticky z-30 bg-slate-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]";
+        if (columnId === "delivery_date") return cn(baseClass, "left-0 border-l-2");
+        if (columnId === "order_quantity") return cn(baseClass, "left-[60px]");
+        if (columnId === "remarks") return cn(baseClass, "left-[110px]");
         return "";
     };
 
@@ -288,8 +315,8 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
                     className="max-w-[150px] h-8 text-xs bg-white"
                 />
             </div>
-            <div className="rounded-md border overflow-x-auto relative">
-                <Table className="border-collapse text-[11px] table-fixed w-full min-w-[1500px]">
+            <div className="rounded-md border overflow-x-auto relative shadow-sm max-h-[70vh]">
+                <Table className="border-collapse text-[11px] w-full min-w-[1200px]">
                     <TableHeader className="bg-slate-50 border-b sticky top-0 z-40">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id} className="hover:bg-transparent">
@@ -312,27 +339,30 @@ export function ProductionPlanTable({ data, onRefresh }: ProductionPlanTableProp
                     </TableHeader>
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    className={cn(
-                                        "hover:bg-slate-50/50 h-10 border-b relative",
-                                        row.original.duplicate_status === "있음" && "bg-red-50 hover:bg-red-100"
-                                    )}
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell
-                                            key={cell.id}
-                                            className={cn(
-                                                "p-1 border-x whitespace-nowrap",
-                                                getStickyClass(cell.column.id)
-                                            )}
-                                        >
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
+                            table.getRowModel().rows.map((row) => {
+                                const isDuplicate = row.original.duplicate_status === "있음";
+                                return (
+                                    <TableRow
+                                        key={row.id}
+                                        className={cn(
+                                            "hover:bg-slate-50/50 h-10 border-b relative group",
+                                            isDuplicate && "bg-red-50 hover:bg-red-100"
+                                        )}
+                                    >
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell
+                                                key={cell.id}
+                                                className={cn(
+                                                    "p-1 border-x whitespace-nowrap",
+                                                    getStickyClass(cell.column.id, isDuplicate)
+                                                )}
+                                            >
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                );
+                            })
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
